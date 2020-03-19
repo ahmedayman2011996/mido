@@ -1,0 +1,38 @@
+# el7ekaya btbda2 lma el user y3mel request le page mo3yna b2st5dam :get post etc n2ol msln : www.google.come 
+nzam el routing bysta2bel el request dy w yrg3 response.
+3n tre2 eno yb3t el request dy lel controller 3shan yrg3 response bel info ely el user tlbha.
+el controller by3mel fetch lel info dy mn el database 3n tre2 el eloquent model w kman momken ydef info lel database bardo 3n tre2 el model w b3den yb3t el info de lel view w y3mel load lel view dh .
+
+# el response momken tb2a string 7ata msh lazem load le view [return view('viewname');,return "hello";] .
+
+# el helper fun view() btnady 3la el views ely mwgoda fe el resources .
+
+# el views b2a heya goz2 el html bta3 el code w btb2a mwgoda fe el resources .
+
+# el blade howa template engine lel laravel
+
+# momken a3mel pass lel data 3n tre2 el query string : http://localhost/project/public/?name=ahmed
+a2dar a3mel fetch lel data dy 3n tre2 el helper fun request : $var = request('name'); el name dh key,ahmed value
+
+# a2dar ab3t el data de lel view 3n tre2 array leh key w el val bta3to el var ely est2belt feh el data bel request fun keda : view('vname',['key',$var]); ely key dh b2a byb2a mota7 lel view
+
+# da5el el view file m7tag est2bel el key dh fbst5dem {{$key}} or {!! $key !!}
+el far2 ben {{}} w {!! !!} : en el ola bt3mel skip lel data dy lma y7sl el compile el tanya la2
+bm3na :  http://localhost/project/public/?name=<script>alert('hello');</script>
+{{$name}} dh hy3mlha skip bm3na eno hytb3 el code dh bs 3la el shasha msh hynfzo k alert
+{!!$name!!} dh msh hy3mel skip w hy3rd el alert
+
+# wildcards : Route::get('test/{id}',fun(){}); el {id} el wildcard dh momken yb2a ay 7aga .
+el wildcard dh bykon mota7 lel fun dy aw el fun bta3t el controller
+
+# Route::get('test/{id}',fun(){}); hena kan el response 3n tre2 fun w dh byb2a 7lew lel small projects
+bs lw el project kper n5ly el response yegy mn el controller
+keda : Route::get('test','mycontroller@mymethod');
+
+# php artisan : feh kol el commands ely momken a7tagha zy create controller : php artisan make:controller mycontroller
+
+# 3shan a3mel access le class odamy tre2ten : ya a3melha use DB; ya a3mel 2blha \ keda : \DB:table(''); w keda ana b3melha access mn el global namespace .
+ 
+
+
+

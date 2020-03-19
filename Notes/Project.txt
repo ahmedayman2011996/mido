@@ -1,0 +1,117 @@
+# lma agy a3mel dashboard le project gded yofdal eny a3mel directory gded lel controllers bta3t el dashboard
+w kman directory gded lel Routes bta3t el dashboard .
+# routes/dashboard/web.php -> dy class gdeda feha el routes el 5asa bel dashboard .
+# Controllers/Dashboard    -> dh el directory bta3 el controllers el 5asa bel dashboard .
+# 3shan arbot el routes dy bel controllers dy :
+
+1.h3mel namespace gded lel controllers directory :
+protected $dashboard_namespace = 'App\Http\Controllers\Dashboard';
+
+2.h3mel fun t3mel map lel routes bta3t el dashboard : heya heya el mapWebRoutes() bta3t el routes el asasya bta3t el project keda :
+protected function mapDashboardRoutes()
+    {
+        Route::middleware('web')
+            ->namespace($this->dashboard_namespace)  -> 3dlt el name space bta3 el controllers .
+            ->group(base_path('routes/dashboard/web.php'));  -> 3dlt el path bta3 el routes .
+    }
+
+3.h3mel call lel fun mapDashboardRoutes() gowa el fun map() ely bt3mel call lel routes bto3 el app .
+
+public function map()
+    {
+        $this->mapApiRoutes();
+        $this->mapWebRoutes();
+        $this->mapDashboardRoutes(); -> dh el call bta3t el routes el gdeda .   
+    }
+
+#######################################################################
+
+# change localhost to custom domain name :
+
+1.aro7 3la el path dh : C:\xampp\apache\conf\extra w aft7  : httpd-vhosts.conf
+w adef el klam dh w mnsash ams7 el ## dy : 
+<VirtualHost *:80>
+    ServerAdmin pos.mido
+    DocumentRoot "C:/xampp/htdocs/pos/public"
+    ServerName pos.mido
+</VirtualHost>
+
+2.aro7 3la el path dh : C:\Windows\System32\drivers\etc w aft7 : hosts
+w adef leh el satr dh : 
+127.0.0.1 pos.mido
+
+#######################################################################
+
+# 3shan a8yar el language : aro7 3la config/app.php w a5ly el lang ar keda :
+
+'locale' => 'ar',
+
+'fallback_locale' => 'ar',
+
+# el github 3leh a8lb el files ely btegy automatic m3a el laravel motrgma :
+lw dwart fe google 3la laravel lang hygebly link lel github a7mel el klam dh 
+w b3den a5od mn folder el src : el ar folder w a7oto copy fe el lang directory fe el project 3ndy . 
+
+#######################################################################
+
+# ana h3mel group lel routes bta3t el dashboard :
+
+Route::prefix('dashboard')->name('dashboard.')->group(function (){
+
+
+    Route::get('index',function (){
+        return 'Hello from Dashboard';
+    })->name('index');  -> dh keda lma anady 3leh bel fun route('dashboard.index') .
+
+prefix('dashboard') -> kol el uri el 5asa bel dashboard hyb2a 2blha kelmet dashboard .
+name('dashboard.')  -> keda ay route gowa el group dy hyb2a esmo dashboard.kaza .
+
+#######################################################################
+
+# el Laravel bytfa2 en el file el blade ely h3melo include b3d keda a5ly esmo awelo _ keda : _errors.blade.php .
+
+#######################################################################
+
+# 3awz adef el language ely btb2a fe el url : http://pos.mido/ar/dashboard/index
+1.hdef el package dy : composer require mcamara/laravel-localization 
+2.w b3den el command dh :
+>>>php artisan vendor:publish --provider="Mcamara\LaravelLocalization\LaravelLocalizationServiceProvider"
+After that, config/laravellocalization.php will be created.
+el file dh feh el language bta3ty h7ded ely ana 3awz ast5dmo : en/ar
+3.el : 'useAcceptLanguageHeader' => true, -> h5leha false 3shan el site yshof el locale bta3y 'ar' .
+'locale' => 'ar', -> lma 5leto false el site gab el language mn hena .
+'fallback_locale' => 'ar',
+4.a7ot el klam dh fe el kernel.php gowa array el middleware : 
+protected $routeMiddleware = [
+	'localize'                => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRoutes::class,
+	'localizationRedirect'    => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRedirectFilter::class,
+	'localeSessionRedirect'   => \Mcamara\LaravelLocalization\Middleware\LocaleSessionRedirect::class,
+	'localeCookieRedirect'    => \Mcamara\LaravelLocalization\Middleware\LocaleCookieRedirect::class,
+	'localeViewPath'          => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationViewPath::class
+    ]; 
+
+5.hdef el klam dh lel web.php bta3 el dashboard :
+Route::group(
+[
+	'prefix' => LaravelLocalization::setLocale(),
+	'middleware' => [ 'localeSessionRedirect', 'localizationRedirect', 'localeViewPath' ]
+], function(){ 
+	# hena el routes bto3y .
+});
+
+6.3shan a3mel selection lel language : hdef el goz2 dh lel app.blade.php bta3 el dashboard 
+@foreach(LaravelLocalization::getSupportedLocales() as $localeCode => $properties)
+    <li>
+        <a rel="alternate" hreflang="{{ $localeCode }}" href="{{ LaravelLocalization::getLocalizedURL($localeCode, null, [], true) }}">
+            {{ $properties['native'] }}
+        </a>
+    </li>
+@endforeach
+
+7.3shan ageb el direction : hdef el direction dh lel html tag 
+<html dir="{{ LaravelLocalization::getCurrentLocaleDirection() }}">
+
+##########################################################################
+
+
+

@@ -1,0 +1,207 @@
+# Gates are most applicable to actions which are not related to any model or resource, such as viewing an administrator dashboard. In contrast, policies should be used when you wish to authorize an action for a particular model or resource.
+
+# gates : heya 3ml gate ben el user w ba3d el actions 
+# el gates w el polices btt3rf fe el AuthServiceProvider.php
+# b3rf el gate fe el boot method keda : 
+Gate::define('post-edit',function(User $user,Post $post){   -> post-edit dh el ability ely el user y2dr y3mlha .
+	return true;
+});
+
+# w ast5dem el gate fe el blade bel directive @can :
+@can('post-edit',$post)
+<form method="get" action="{{route('posts.create')}}" >
+    @csrf
+    <button class="btn btn-success">Create New Post</button>
+</form>
+@endcan 
+keda msh hyshof el button dh 8er el user ely 3amel sign in.
+
+# momken ast5dem el methods allows w denies 3shan a3mel el action lw el user auth w arfdo lw howa msh auth :
+if (Gate::allows('update-post', $post)) {
+    // The current user can update the post...
+}
+
+if (Gate::denies('update-post', $post)) {
+    // The current user can't update the post...
+}
+
+# w momken ast5demhom kman fe el blade :
+ @if(Gate::allows('post-edit',$post))
+            <td>
+                <a href="posts/{{$post->id}}">{{$post->title}}</a>
+            </td>
+            @endif
+                @if(Gate::denies('post-edit',$post))
+                    <td>
+                        {{$post->title}}
+                    </td>
+                @endif
+
+# lw 3awz a3mel exception lw el user msh msmo7 leh y3mel action mo3yan :
+Gate::authorize('update-post', $post);
+
+########################################################################
+
+# polices : heya classes btnzm el authorization logic le model aw resource .
+# b3mel el policy keda w kman arbotha bel model keda w feha el CRUD methods :
+>>> php artisan make:policy PostPolicy --model=Post
+
+# b3den lazem a3mel register lel policy dy fe el AuthServiceProvider
+protected $policies = [
+        Post::class => PostPolicy::class,
+    ];
+
+# w agy 3la el Policy class :
+public function update(User $user, Post $post)
+    {
+        return true;
+
+    }
+
+# w ast5dem bardo el policy fun fe el blade bel directive @can :
+@can('update',$post)
+<form method="get" action="{{route('posts.create')}}" >
+    @csrf
+    <button class="btn btn-success">Create New Post</button>
+</form>
+@endcan 
+
+
+#######################################################################
+
+# example b2a 7elw 3shan nzbot el m3loma : 
+ana 3amel 2 users : ahmedayman20196@gmail.com & kingfire1996@gmail.com
+ahmed el id bta3o =1 w king el id bta3o =2 w get 3la el policy class w 3mlt keda : 
+public function update(User $user, Post $post)
+    {
+        if($user->id===1){
+        return true;
+        }
+
+    }
+w ro7t 3la el blade w 3mly keda : 
+@can('update',$post)
+<form method="get" action="{{route('posts.create')}}" >
+    @csrf
+    <button class="btn btn-success">Create New Post</button>
+</form>
+@endcan 
+
+keda ely hyshof el goz2 dh howa ahmed bs laken king lw 3ml sign in msh hyshof el goz dh .
+
+# el fun dy lw dftha lel Policy class httnfz 2bl ay 7aga fe el class y3ny 2abl el update fun :
+public function before(User $user){
+        if ($user->id===2){
+            return true;
+        }
+    }
+keda k2en king hena admin y2dr yshof ely kan el mfrod ahmed bs yshofo .
+
+# lw 3awz ast5dm el gate msh el policy hdef el goz2 dh lel AuthServiceProvider fe el fun boot :
+Gate::before(function (User $user){ -> el fun before dy httnfz 2abl ay fun fe el policy aw fe el gate .
+          if ($user->id===2){
+              return true;
+          }
+       });        
+
+
+#######################################################################
+
+# Roles and abilities : kol user byb2a leh role zay el admin aw el manager etc.
+kol role byb2a leh abilities y2dr y3mlha zay edit_forum aw delete_forum etc .
+
+# 3mlt migration file feh kol el tables ely ana m7tagha w rbthom keda :        
+
+public function up()
+    {
+        Schema::create('roles', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->string('name');
+            $table->string('label')->nullable();
+            $table->timestamps();
+        });
+
+        Schema::create('abilities', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->string('name');
+            $table->string('label')->nullable();
+            $table->timestamps();
+        });
+
+        Schema::create('ability_role', function (Blueprint $table) {
+            $table->primary(['role_id','ability_id']);
+            $table->unsignedBigInteger('role_id');
+            $table->unsignedBigInteger('ability_id');
+            $table->timestamps();
+
+            $table->foreign('role_id')->references('id')->on('roles')->onDelete('cascade');
+            $table->foreign('ability_id')->references('id')->on('abilities')->onDelete('cascade');
+        });
+
+        Schema::create('role_user', function (Blueprint $table) {
+            $table->primary(['user_id','role_id']);
+            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('role_id');
+            $table->timestamps();
+
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('role_id')->references('id')->on('roles')->onDelete('cascade');
+
+        });
+    }
+
+# w 3mlt el models Ability w Roles w el User mwgod asln .
+User.php
+ public function roles(){ -> hena hrbot el user bel roles
+
+        return $this->belongsToMany(Role::class)->withTimeStamps();
+    }
+
+    public function assignRole($role){  -> fun hdy beha roles lel users , htst2bel role w t7fzo fe el roles bta3t
+    																	el user .	
+        $this->roles()->save($role);
+    }
+
+    public function abilities(){ -> mfesh 3laka mobashra ben el users w el abilities 3shan keda 3mlt el fun dy 
+    															ely htrg3 el abilities bto3 el roles lel user .
+        return $this->roles->map->abilities->flatten()->pluck('name')->unique();
+    }    
+
+Role.php
+
+ public function abilities(){
+ 	return $this->belongsToMany(Ability::class)->withTimeStamps();
+ }
+
+ public function assinAbility($ability){
+ 	$this->abilities->save($ability);
+ }
+
+ Ability.php
+
+ public function roles(){
+ 	return $this->belongsToMant(Role::class)->withTimeStamps();
+ }
+
+ # fe el blade file b2a : 
+
+@can('edit_forum')   -> dy el ability ely httb3t lel Gate
+<li>
+    <a href="#">Edit Forum</a>
+</li>
+@endcan
+@can('delete_forum')  -> dy el ability ely httb3t lel Gate
+   <li>
+       <a href="#">Delete Forum</a>
+   </li>
+@endcan
+
+# fe el AuthServiceProvider.php gowa el fun boot :
+
+Gate::before(function($user,$ability){  -> dy el ability ely gatly mn @can
+	return $user->abilities()->contains($ability); -> lw el abilities bta3t el user feha el ability ely galy mn 
+															@can return true w eft7 el gate .
+});												   -> el fun abilities beha 5let el user ywsal lel abilities 
+													  3n tre2 el roles .		
+												   -> lw msh hst5dem el fun dy ely 3mltha ana fe el User
+					     a3mel keda : return $user->roles->abilities->pluck('name')->contains($ability);	  	

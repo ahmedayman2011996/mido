@@ -1,0 +1,34 @@
+# Crud Controller : create read update delete controller
+el controller dh bmograd eny a3melo create by3mely el methods bta3to m3ah
+bysmohm : the seven restful controller actions :
+1- index() : render a list of resources -> get /articles
+2-show() : show a single resource -> get /articles/{id}
+3-create() : show a view to create a new resource -> get /articles/create
+4-store()  : store the new resource -> post /articles
+5-edit() : show a view to edit an existing resource -> get /articles/{id}/edit
+6-update() : store the edited resource -> put /articles/{id}
+7-destroy() : delete the resource -> delete /articles/{id}
+3shan a3mel create lel crud controller w kman m3ah el model bta3o : 
+php artisan make:controller controller-name -r -m model-name
+
+# 3shan a3mel el routes bta3t el crud controller : Route::resource('posts','PostController');
+
+# momken a3mel lel route name keda : Route::get('posts','PostController@method')->name('posts.show');
+3shan a3rf a3melo call bel fun dy : route('posts.show') .
+
+# el funs : show & edit & update & destroy by7tago id el 7aga ely hysht8lo 3leha 3shan keda bb3t el id fel el action keda : <form method="get" action="{{route('posts.edit',$a->id)}}"> w nafs el nzam lel show & update & delete .
+momken ab3t el object bs w el laravel hy3mel fetch lel id .
+
+# el browser msh byfham 8er el 2 requests dol : get & post 3shan keda lma a3oz ast5dem 8erhom bagy gowa el form w a3mel keda : @method('put') @method('delete') etc .
+
+# 3shan atl3 error message le input wa7ed : 
+@error('title')
+  {{$errors->first('title')}}
+@enderror
+aw :
+@error('title')
+        {{$message}}
+@enderror
+
+# 3shan a7afez 3la el value ely ana d5ltha fe input field b3d ma 3mlt submit w galy el errors bta3t el validation a3mel keda gowa el form fe goz2 el input dh : value="{{old('input-name')}}"
+

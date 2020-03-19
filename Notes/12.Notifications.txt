@@ -1,0 +1,109 @@
+# el notification momken yb2a mail aw sms etc .
+
+3mlt form le button lma ad8t 3leh hysh8l el fun store fe el controller
+public function store(){
+        Notification::send(request()->user(),new PaymentReceived()); -> el facade Notification zy el facade Mail
+
+        return redirect('payment')->with('message','Notification Sent ');
+    }
+3mly instance mn el Notification class : PaymentReceived ely gowaha el fun dy : 
+public function toMail($notifiable)  -> el fun dy heya ely bt3mel el content(message) bta3t el notification mn 8er 
+    {																						 la view wla markdown .
+        return (new MailMessage)
+        			->subject() ->b3dl w adef el fun ely 3awzha : subject line action etc .
+        			->gretings()
+        			->line() 
+                    ->line('The introduction to the notification.')
+                    ->action('Notification Action', url('/'))
+                    ->line('Thank you for using our application!');
+    }
+# el delivery channels ely hst5dmha fe twsel el notification :
+public function via($notifiable)
+    {
+        return ['mail']; -> momken a5leha mail, database ,sms etc . 
+    }    
+
+# el 5olasa lma bd8t 3la el button el controller byst5dm el facade Notification 3shan yb3t lel user instance mn el notification class : PaymentReceived ely hyb3t el notification mn 8er la view wla markdown .  
+
+Notification::send(request()->user(),new PaymentReceived());
+= request()->user()->notify(new PaymentReceived());
+el 2ola facade w el tanya helper fun .
+
+############################################################
+
+# Database Notifications : h3mel store lel notification fe el database
+3shan ast5demha lazem a3mel table 3shan a5zn feh el notifications.
+>>> php artisan notification:table
+>>> php artisan migrate .
+
+# w kman m7tag azod el database k channel 3ndy :
+public function via($notifiable)
+    {
+        return ['mail','database']; -> ana keda hrsl el notification 3n tre2 el mail w kman h7fzha fe el DB .  
+    }
+
+lma el user hyd8at 3la el button hygelo mail 3la el mailtrap w kman el notification htt5zn fe el DB .
+
+# 3awz azher resala b2a lel user en el action ely howa 3mlo tm mzbot :
+h3mel route yzhr feh el resala dy w fe el controller bta3ha NotificationController
+public function show(){
+		$notifications = auth()->user()->unreadNotifications; -> hat el unread notifications bs.
+		$notifications->markAsRead(); -> a3mlohom b2a read .
+        return view('notifications',['notifications'=> $notifications ]);
+    # tre2a tanya bdl el 3 stor ely fo2 dol :
+         return view('notifications',['notifications'=> tap(auth()->user()->unreadNotifications)->markAsRead() ])
+    # el tap fun btrg3 value el gowaha w lma t3mel call le additional fun zy markAsRead 3la el value dy htrg3 brdo nafs el value el adema . asl auth()->user()->unreadNotifications htrg3 el notification el msh mkro2a w el fun markAsRead htrg3 void .    
+    }
+el notifications dy fun feha el relationship ben el user w el notification tables .
+
+el controller hyb3t lel view instance mn el notification w el view hyst5dm el notification var dh .
+<ul>
+    @forelse($notifications as $notification) ->el forelse dy zy el foreach bs byb2a feha else(@empty) condition.
+         <li>
+             @if($notification->type==='App\Notifications\PaymentReceived')
+                 Payment Completed Successfully
+             @endif
+         </li>
+        @empty         -> el code dh hytnfz lw mfesh 7aga el for t3rdha .
+            <li>You Have No Notifications</li>
+        @endforelse
+</ul>
+
+
+############################################################
+
+# SMS Notifications : SMS notifications leha channel zay el email w el database .
+3shan a3mel install lel sms channel :
+composer require laravel/nexmo-notification-channel
+
+b3den aro7 3la el .env w adef : el key w el secret agebhom mn el account bta3 el nexmo
+NEXMO_KEY=a4c17e4d
+NEXMO_SECRET=QRn7LbWqpE66GPfr
+
+b3den aro7 3la el config/services.php w adef el stren dol :
+'nexmo' => [
+    'sms_from' => '15556666666',
+],
+
+w fe el notification class azwed el channel : 
+public function via($notifiable)
+    {
+        return ['mail','database','nexmo'];
+    }
+w kman adef el fun dy : byb2a feha el conetent bta3 el sms . 
+public function toNexmo($notifiable)
+{
+    return (new NexmoMessage())
+                ->content('Your SMS message content');
+                ->from() -> lw 3awz a2ol el message mn men .
+}    
+
+3shan b2a a3mel route(twgeh y3ny) el notification dy le rakam el phone el s7e7 :
+adef el fun dy lel User Model :
+ public function routeNotificationForNexmo($notification)
+    {
+        return $this->phone_number;
+    }
+
+
+# fe el Laravel documentation fe el 5twat ely fatet dy beltfsel .

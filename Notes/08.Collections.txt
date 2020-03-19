@@ -1,0 +1,75 @@
+# Collections : 
+# lma a3mel el query dy : >>> $post = App\Post::first(); -> 3mlt hena fetch le post wa7ed
+=> App\Post {#3034 -> f 3mly hena instance lel post 
+     id: 2,
+     title: "post 2",
+     desc: "desc for post 2",
+     created_at: "2020-03-09 11:39:02",
+     updated_at: "2020-03-09 11:39:02",
+   }
+bel instance dh a2dar awsal le kol el attributes bta3t el post dh :
+$post->title; & $post->desc; etc .
+
+# bs lma a3mel el query dh : >>> $posts = App\Post::all(); -> 3mlt hena fetch le kol aw 3dd mn el posts
+=> Illuminate\Database\Eloquent\Collection {#3030 -> f 3mly hena collection 
+     all: [
+       App\Post {#3040
+         id: 2,
+         title: "post 2",
+         desc: "desc for post 2",
+         created_at: "2020-03-09 11:39:02",
+         updated_at: "2020-03-09 11:39:02",
+       },
+       App\Post {#3039
+         id: 3,
+         title: "post 3",
+         desc: "desc for post 3",
+         created_at: "2020-03-09 12:16:01",
+         updated_at: "2020-03-09 12:16:01",
+       }
+# el collection dh api moshabeh le sql query feh kol el methods ely momken t7tgha 3shan t3ml 3mlyat zay el query . 
+>>> $posts->where('title','post 4')  :-> dh msh query el where dy method fe el collection
+=> Illuminate\Database\Eloquent\Collection {#3044
+     all: [
+       2 => App\Post {#3027
+         id: 4,
+         title: "post 4",
+         desc: "desc for post 4",
+         created_at: "2020-03-09 12:17:14",
+         updated_at: "2020-03-09 12:17:14",
+       },
+     ],
+   }
+
+# dh query 3ady :
+>>> App\Post::where('title','post 4')->first() 
+=> App\Post {#3027
+     id: 4,
+     title: "post 4",
+     desc: "desc for post 4",
+     created_at: "2020-03-09 12:17:14",
+     updated_at: "2020-03-09 12:17:14",
+   }
+
+# momken ana a3mel collection :
+>>> $items = collect([1,2,3,4,5])
+>>> $items->first()   -> output : 1
+>>> $items->filter(function($item) {return $item > 2 ;}) -> output : 3 4 5 
+
+
+
+###############################################################
+
+# CSRF : cross site request forgery (tzwer 3abr el sites)
+
+# csrf attacks : In a CSRF attack an innocent end user is tricked by an attacker into submitting a web request that they did not intend .
+
+# nfrd eny 3amel 2 projects : attacker & target 
+fe el target fe route by3mel logout esmo target/logout
+el attacker 3ml 3ando fe el project pta3o link lma el end user fe el project target yd8t 3leh y3melo logout mn el project target ^__^ .
+el csrf token b2a bt7my mn el 7warat dy .
+<form method="post" action="target/logout">
+<button>Continue</button>
+</form> ^___^
+
+# lw mdftsh @csrf lel form el request htdeny 419 error for csrf match .

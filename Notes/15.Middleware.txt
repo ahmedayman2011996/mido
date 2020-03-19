@@ -1,0 +1,16 @@
+# el middlerware zay ma 2olna abl keda eno zay el tb2at ely 3shan twsal lel 7aga ely enta
+3awzha lazem t3dy el tb2at dy el awel .
+
+# el middlewars mwgoda fe kernel.php fe arrays leha key w value el key howa ely ana bst5dm beh el middleware 
+zay middleware('auth') , el value heya class el middle ware nafso el mwgoda fe el directory Middleware .
+
+# 3shan ast5dem el middleware 3la el route : 
+Route::get('posts','mycontroller.index')->middleware('auth');
+# el auth dh wa7ed mn el middleware el gahza zay el guest w 8erhom .
+
+# tayeb lw 3awz akter mn route yb2o lehom nafs el middleware :
+Route::group(['middleware'=>'guest'],function(){
+    Route::get('mylogin','UserController@login_get');
+    Route::post('mylogin','UserController@login_post');
+});
+

@@ -1,0 +1,47 @@
+# el event howa action 7sal fe el system bta3y .
+# el listener bysm3 lel event .
+# lw 3awz azher kol el events & listeners fe el application :
+>>> php artisan event:list .
+# 3shan a3mel new event class :
+>>> php artisan make:event ProductPurchased .
+# hla2eh mwgod fe App\Events\ProductPurchased.php .
+# 3shan a3mel new listener class :
+>>> php artisan make:listener Achievements .
+# lw 3awz a7dd el event ely el listener bysm3lo :
+>>> php artisan make:listener Achievements -e ProductPurchased .
+# hla2eh mwgod fe App\Listeners\Achievements.php .
+
+# ana b3mel link ben el event w el listener fe el EventServiceProvider.php gowa el listen array :
+ProductPurchased::class => [ Achievements::class ]
+           
+el event howa el key w el listener howa value fe array 3shan momken yb2a 3ndy aktr mn listener lnfs el event. 
+
+# momken m3msh el tre2a ely fatet dy 5als 3shan arbt el event bel listeners bto3o w ast5dm el fun dy : 
+public function shouldDiscoverEvents()
+    {
+        return true;
+    }
+el fun dy lma adefha lel EventServiceProvider btrbot kol listener bel event ely bysh8lo lw7dha ^__^ .    
+
+#########################################
+
+# yb2a e7na hn3mel make lel event w el listeners bto3o w nrbothom fe el EventServiceProvider
+w lma el controller ysh8l el event keda :
+ public function store(){
+        ProductPurchased::dispatch(); -> ya ema a3mel dispatch lel Event class 
+        = event(new ProductPurchased);  -> ya ast5dm el helper fun event .
+    }        
+
+y2om el event msh8l el listener bta3o w y2om el listener y3mel 7aga mo3yna lma el event ysht8l 
+bel fun handle :
+public function handle(ProductPurchased $event)
+	{
+    	var_dump('Check for new Achievements'.'<br>');
+	} 
+
+# el fayda mn el events w el listeners :
+bdal ma yb2a el controller fun zy el fun store mlyan side effects zy el notification aw el email 
+3awz a5ly el fun feha bs el core logic zy el process 3la el data w keda .
+ana momken a5ly kol 7aga 3andy fe el fun 3ady mfesh moshkela bs momken yb2a el 3mlyat ely bt7sal kter awy eny a5leha fe mkan wa7ed sa3tha ast5dm el event & listener 3shan aseb bs el main aw el core processes fe el fun w el side effects zy el notification fe listener ely hysht8l lma a3ml dispatch lel event ely howa bysm3lo .
+
+# note : el event properties lazem tb2a public . 	

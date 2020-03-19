@@ -1,0 +1,132 @@
+# fe el file .env : dh goz2 el database w kol key byb2a refernce l7aga fe el config file
+DB_CONNECTION=mysql -> h3mel connection b anhy database
+DB_HOST=localhost
+DB_PORT=3306
+DB_DATABASE=project ->esm el database
+DB_USERNAME=root
+DB_PASSWORD=
+
+# fe el eloquent model : 1-a2dar a3mel SQL query -> ageb data mn el DB y3ny .  w kman 2-a3mel store lel data fe el DB .
+
+# esm el model ykon mofrd w esm el table gam3 w kolo small y3ny lw ana 3mlt model esmo Post hyt3mly table esmo posts .
+
+# Query builder(fluent) & eloquent :
+1-fluent : DB::table('posts')->where('id',$id)->first(); el $id-> dh gayly mn el route , 'id'->elmwgod fe el DB .
+2-eloquent : Post::where('id',$id)->first(); .
+
+# lw 5let el fun first() ely btrg3 awel record ytab2 el shroot ->firstOrFail(); 
+keda lw ml2ash record ytab2 el shroot yrg3 404|Not Found .
+
+# fe el migration file el down method bt3mel undo l ay 7aga bt3mlha el up method bm3na en lw el up 3mlt create 
+le table el down t3mlo drop lw el up 3mlt create col el down t3melo drop .el up btsht8al lma a3mel migrate w el down btsht8al lma a3mel rollback .
+
+# lw ana 3mlt migration table l 7bet b3dha adef col gded momken adef el col dh 3n tare2 migration table tany ^__^
+keda : php artisan make:migration add_title_to_posts_table 
+lma nfzt el command dh dafly col el title le table el posts ^__^ el 7war dh mofed gedn lw ana 5las el code bta3y et3mlo production laken lw lesa fe mr7let el development mlhash lzma a3mel table 3shan adef col le table tany y3ny .
+
+# shwayet commands : php artisan make:controller controller_name -r -> crud controller .
+php artisan make:model model_name . php artisan make:migration migration_name
+php artisan make:model model_name -m . keda h3mel model w migration fe nafs el wa2t .
+php artisan migrate . keda byr7l el data mn el mogration file lel database 
+php artisan migrate:rollback -> drop l col el cols . php artisan migrate:refresh ->drop w b3den create l kol el tables.
+php artisan make:model model_name -mc -> ana kman momken w ana b3mel model a3mel m3ah migration w kman controller 
+php artisan make:model model_name -a -> all ^__^ y3ny controller w migration w factory w seed w kolo .
+
+# momken ast5dm el model nafso 3shan ad5l el data b2st5dam el tinker : a2dr a3mel beh run le basic commands
+php artisan tinker
+>>>$add = new App\mymodel;
+>>>$add->title = 'ahmed';
+>>>$add->save();
+w keda ana est5dmt el tinker 3shan ad5al data lel database
+w kman momken a3mel fetch l kol el data fe el DB keda : App\mymodel::all(); aw awel wa7ed bs b first()
+w momken a3mmel : App\mymodel::take('2')->get(); 3shan ageb awel 2 bs
+aw : App\mymodel::paginate('2'); 3shan ageb bardo 2
+aw : App\mymodel::latest()->get(); 3shan ageb el records mtrtben tnazoly
+w momken a3mel condition : App\mymodel::where('id',$id)->first();
+w momken kman a3mel update lel data : 
+>>>$up = App\mymodel::first();
+>>>$up->title = 'mido';
+>>>$up->save(); 
+>>$up->title; output : mido .
+
+# $table->boolean('completed')->nullable(); ana keda msh bs 5let el default bta3ha b null dh ana kman 7dedt el el intial value bta3tha false .
+a2dar a3melo update w w a5leh true keda : haro7 3la el model (mymodel) nafso w a3mel fun :
+public fun complete(){
+	$this->completed=true; -> completed dh el col
+	$this->save();
+}
+b3den aft7 el tinker tany w a3mel :
+>>>$up = App\mymodel::first();
+>>>$up->complete();
+w momken a3mel zy ma 3mlt fe el title keda :
+>>>$up->completed = true;
+>>>$up->save(); 
+eh b2a el far2 ?? it depends ^__^ y3ny 7asb el 7aga ely enta 3awz t3mlha .
+
+# 3shan a3mel valitadion w b3den a5zn el data dy fe el database :
+public function store(Request $request)
+    {   
+        $data = $request->validate(['title'=>'required|min:3','desc'=>'required']);
+        Post::create($data);
+        bs hena el laravel by7mek l en msh kol 7aga mn el request t2dar t8yar record fe el table bta3k
+        fbytlob mnk enk tdef el 7aga dy lel fillable property 3ndk fe el model keda :
+            protected $fillable = ['title','desc']; 3shan myb2ash mass assingment .
+        la7ez eny lma a3mel validate eny b3mel request lel data f msh m7tag a3mel request leha tany
+        3shan a3melha create .    
+
+        aw : $request->validate(['title'=>'required','desc'=>'required']);
+        $add = new Post; -> Post dh el model
+        $add->title = request('title'); -> el request fun dy btgebly el data mn el form aw el query string .
+        $add->save();
+
+        aw : $data = $request->validate(['title'=>'required|min:3','desc'=>'required']);
+        \DB::table('posts')->insert($data); -> dy tre2a esmha el query builder (fluent).
+
+        return redirect(route('posts.index')); -> keda 3mlt redirct 3la el route dh b esm el route .
+    }
+
+# el funs : show & edit & update & delete by7tago id el 7aga ely hysht8lo 3leha 3shan keda bb3t el id fel el action keda : <form method="get" action="{{route('posts.edit',$a->id)}}"> w nafs el nzam lel show & update & delete .
+public function edit($id)
+    {
+        $edit = Post::find($id);
+        return view('create',['edit'=>$edit]);
+    }
+
+# el updata howa howa el store bs bt7tag id  action="{{route('posts.update',$a->id)}}"
+public function update(Request $request,$id)
+    {
+        $data = $request->validate(['title'=>'required','desc'=>'required']);
+    	$up = Post::find($id);
+        $up->title = request('title');
+        $up->desc = request('desc');
+        $up->save();
+        aw : $data = $request->validate(['title'=>'required','desc'=>'required']);
+        $up->update();
+        return redirect(route('posts.index'));
+
+    }
+
+# 3shan ast5dm el soft delete :
+# aro7 3la el model :
+use Illuminate\Database\Eloquent\softDeletes;
+# w gowa el class :
+use softDeletes;
+# w fe el migration file : 
+$table->softDeletes(); 
+
+# el delete kman bt7tag el id action="{{route('posts.destroy',$a->id)}}"
+public function destroy($id)
+    {
+        $del = Post::where('id',$id)->first(); 
+    aw  $del = Post::find($id);
+        $del->delete();
+        return redirect(route('posts.index'));
+    }
+
+
+# lw 3awz a3mel force delete msh soft delete :
+$del->delete(); -> h5leh $del->forceDelete();
+
+
+# w 3shan ageb mn el database el 7agat ely ana 3mltlha soft delete :
+Post::onlyTrashed(); -> el fun dy btgeb ely et3mlo soft delte .

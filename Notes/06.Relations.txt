@@ -1,0 +1,118 @@
+# lw ana 3andy 2 eloquent models : User & Post
+w 3awz arbot el User model bel Post model : fh7tag eny a3mel relationship ben el User model w el Post Model
+
+# el relationships : hasOne & hasMany & belongsTo & belongsToMany .
+3shan a3mel relationship h3mel fun fe User model t2ol eno leh 3laka m3a el Post model w fun fe el Post model
+t2ol eno yntmy lel User model .
+ex: User.php  
+public function posts(){
+	return $this->hasMany(Post::class);
+}
+Post.php
+public function user(){
+	return $this->belongsTo(User::class);
+}
+public function author(){ -> lw hst5dem esm fun msh howa nafs esm el class User
+ return $this->belongsTo(User::class,'user_id'); ->hdef el forgein key ka parameter lw hst5dm esm fun msh howa esm el  
+}									        class User l2n laravel hykon bydwar 3la author_id ely howa msh mwgod asln. 				
+
+el methods dy a2dar a3melha call k2nha property keda : $user = App\User::find(1);
+$user->posts; aw $user = App\User::find(1)->posts; el stren fe nafs el satr .
+
+# note : b3d kol update e2fel el tinker w eft7o tany .
+
+w kman h7tag en el user_id ykon column fe el Post model :
+hdefo lel migration file bta3 el posts table : $table->unsignedBigInteger('user_id'); el col dh lazem yb2a mn nafs no3 el primary key bta3o ely howa $table->bigIncrements('id'); fe table el users .
+bigIncrements('id') howa kman unsigned primary key w el type bta3o big integer . 
+
+# lma a7b amla el table bta3y data bs msh fare2 m3aya el value bta3t el data dy ast5dem el Factory
+ad5ol 3la el tinker : php artisan tinker . w ast5dem el helper fun factory(class-name)->create();
+>>>factory(App\User::class)->create();
+>>>factory(App\User::class,5)->create(); -> el 5 dy heya 3dd users ely hdefhom .
+
+# 3shan a3mel factory gded : php artisan make:factory factory-name -m "App\Post"
+keda 3mlt el factory w kman rabto bel model Post .
+adef b2a el data lel : PostFactory.php
+$factory->define(Post::class, function (Faker $faker) {
+    return [
+    	'user_id' => factory(\App\User::class), -> hena hyrg3 el primary key bta3 el User hena 
+        'title' => $faker->sentence,
+        'title' => $faker->paragraph
+    ];
+});
+el faker class dh momken y3mel generate le ay 7aga name aw scentence aw paragraph etc .
+
+# 3shan a3mel post aw akter le user asln mwgod fel el data base :
+>>>factory(\App\Post::class)->create(['user_id'=>1]); -> keda 3mlt post lel user ely el id bta3o 1 .
+bs ana b3d kol dh brdo lw 3mlt delete lel user dh el records(posts) ely howa 3mlha htfdal w dh msh sa7 
+asl ana msh hms7 el user w aseb ely howa 3mlo . 3shan a7el el moshkela dy :
+hdef lel migration file bta3 el posts table b3d el satr dh $table->unsignedBigInteger('user_id');
+$table->forgein('user_id')->references('id')->on('users')->onDelete('cascade');
+keda el "user_id" b2a forgein key fe table posts 3a2d 3la el primary key "id" fe el users table f lma a3mel delete lel user ely el id bta3o '3' msln kol el posts ely howa 3lmha hyt3mlha delete  
+
+# belongToMany relationship : 3awz a3mel rabt ben el models Post w Tag(model lesa 3amlo 7aln) el tables bta3thom bm3na as7 . hena h7tag a3mel table talt(linking table) yb2a 7aga zay waset keda ben el etnen : fe tre2ten 
+1-ya a3melo 3ady model be table monfasel 
+2-ya adefo gowa table mn el tables bto3hom el mwgoden asln gowa el fun up keda :
+ public function up(){
+Schema::create('article_tag', function (Blueprint $table) { -> esm el table dh yb2a gam3 benhom el esmohom el 2
+            $table->id();
+            $table->unsignedBigInteger('post_id');
+            $table->unsignedBigInteger('tag_id');
+            $table->unique(['post_id','tag_id']);
+            $table->foreign('post_id')->references('id')->on('tags')->onDelete('cascade');
+            $table->foreign('tag_id')->references('id')->on('posts')->onDelete('cascade');
+            $table->timestamps();
+        });           }
+rabt el many2many :
+Post.php  
+public function tags(){
+	return $this->belongsToMany(Tag::class); -> el post momken yb2a leh aktr mn tag
+}
+Tag.php
+public function posts(){
+	return $this->belongsToMany(Post::class); -> el tag byntmy le akter mn post 
+}
+php artisan tinker :
+>>>$post = App\Post::first();
+>>>$post->tags;        
+>>>$tag = App\Tag::first();
+>>>$tag->tags;
+
+# 3shan azher el tags bta3t el posts fe el blade :
+@foreach($post->tags as $tag)
+{{$tag->name}}
+@endforeach
+
+# 3shan a3mel attach w detach bel tinker :
+>>>$post = App\Post::first();
+>>>$post->tags()->attach(1); -> 3mlt attach le tag wa7ed
+>>>$post->tags()->attach([1,2]); -> aktr mn tag 
+>>>$post->tags()->detach(1); -> 3mlt detach le tag wa7ed
+
+
+
+# 3shan a5tar tag lel post ely ana b3melo create :
+
+fe el create blade file : -> dh hyst2bel el tags
+<select name="tags[]" multiple>
+    @foreach($tags as $tag)
+        <option value="{{$tag->id}}">{{$tag->name}}</option>
+    @endforeach
+</select>
+
+w ab3t el tags fe lel view create keda : -> dh hyb3at el tags
+public function create()
+    {
+        $tags = Tag::all();
+        return view('create',['tags'=>$tags]);
+    }
+
+w a3mel lel tags store keda :
+public function store(Request $request)
+    {
+        $data = $request->validate(['title'=>'required','desc'=>'required']);
+        $post = Post::create($data);
+        $post->save();
+        $post->tags()->attach(request('tags')); -> est5dmt el object bta3 el Post 3shan a3mel attach lel tags .
+        return redirect(route('posts.index'));
+    }

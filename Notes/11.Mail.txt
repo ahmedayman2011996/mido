@@ -1,0 +1,123 @@
+# awln 3shan ab3t mail lazem a7ded hywsal 3la eh aw eh heya tre2t el ersal hena bnst5dm el log :
+MAIL_MAILER=log  -> el log dh howa el laravel.log : storage\logs\laravel.log .
+MAIL_HOST=smtp.mailtrap.io
+MAIL_PORT=2525
+MAIL_USERNAME=null
+MAIL_PASSWORD=null
+MAIL_ENCRYPTION=null
+MAIL_FROM_NAME="${APP_NAME}"
+
+# fe el config\mail.php homa m7deden el default sender 
+ 'from' => [
+        'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),
+lw 3awz ana a8yro aro7 lel .env w a7ded el sender keda : MAIL_FROM_ADDRESS=btata@example.com
+
+# 3mlt form 3shan el user yrsl email mn el app le nafso zy bta3 forget my password keda 
+3bara en input lel email w submit button 
+w fe el controller :
+public function store(){
+    request()->validate(['email'=>'required|email']);
+    Mail::raw('It Works',function ($message){ -> el facade Mail dy btb3t mail lel user el fun raw 3shan raw mail
+        $message->to(request('email'))->subject('Hello There');								   mail ay klam y3ny.
+    });
+    return redirect('contact')->with('message','Mail Sent');
+}
+
+# el with() dy 3shan w ana b3mel redirct a3mel flash message . 
+# el raw fun dy 3shan arsel simple text mail .
+
+# fe el blade file : 3shan ash8l el flash message : 
+@if(session('message'))
+<div class="text-red-50">
+    {{session('message')}}
+</div>
+@endif
+
+# est5dam el mailtrap fe 3ml simulate lel real life inbox bdl est5dam el log :
+MAIL_MAILER=smtp  -> h5ly el mailer smtp . 
+MAIL_HOST=smtp.mailtrap.io -> w kman el host .
+MAIL_USERNAME=a3c0f9d95e444e
+MAIL_PASSWORD=f40ca8e8aa84cf
+# hageb el username w el password bto3y mn el account bta3y 3la el mailtrap
+b3d ma bd8t 3la send email button hywfly el email fe el inbox bta3y 3la el mailtrap 
+heya heya tre2t ersal el mail 3la el log .
+bs kol dh e7na bnrsl text bs el goz2 el gay hnrsl html emails .
+
+##########################################################################
+
+# send html emails using Mailable classes :
+hn3mel mail class keda : php artisan make:mail ContactMe .
+el class htt3ml hena : App\Mail\ContactMe.php .
+
+1-hn3mel view : contact-me.blade.php feha ay resala .
+2-hnro7 3la el class : ContactMe
+public function build()
+    {
+        return $this->view('contact-me'); -> a5ly el fun build trg3 el view ely 3awz ab3tha fe el mail . 
+    }
+3- aro7 3la el controller : 
+public function store(){
+        request()->validate(['email'=>'required|email']);
+        Mail::to(request('email'))->send(new ContactMe()); ->b3tt lel user instance mn el class ContactMe
+        return redirect('contact')->with('message','Mail Sent');
+    }    
+el controller hyb3t resala lel user feha instance mn el mail class ContactMe 
+we el ContactMe ytrg3 el view .
+
+# el public properties(variables) fe el mail classes byb2a available lel view .
+ex : el controller hyb3t data lel mail class keda : 
+Mail::to(request('email'))->send(new ContactMe('Orange'));  ->'orange' el text dh el data ely hb3tha lel mail class
+fe el ContactMe : est2bel el data ely gatlo mn el controller w 5znha fe property 
+public $topic;
+public function __construct($topic)
+    {
+        $this->topic = $topic;
+    }
+el property dh available lel view : contact-me .
+<p>We Want To Talk To You About {{$topic}}</p>    
+
+# el 5olasa : faydet el mail class enha bt3rd el view w el data feha mota7a lel view kman
+fmograd en el controller yb3t lel user instance mn el mail class y2om el mail class ba3t el data ely feh lel view w b3den y3rdha .
+
+# 3shan myb2ash esm el subject howa esm el instance fe el mail ely bywsal lel user : 
+public function build()
+{
+    return $this->view('emails.contact-me')
+        ->subject('More Info About Us '); -> 7dedt el subject w ana brg3 el view .
+} 
+
+##########################################################################
+
+# Send email Using Markdown Templates :
+el markdown dh 7aga zay el view keda msh b7tag feha akteb html code .
+public function build()
+{
+    return $this->markdown('emails.contact-me') -> fe el mail class bdlt el fun view bel fun markdown .
+        ->subject('More Info About Us '); -> 7dedt el subject w ana brg3 el view .
+} 
+
+# w momken w ana b3mel mail class a3mel m3ah markdown template keda : 
+>>>php artisan make:mail Contact --markdown=emails.contact 
+emails dy el directroy & contact dh esm el blade file ely ht3mal w feh el markdown template .
+el mail class Contact htb2a zay ay mail class bs bdl ma el build fun btrg3 view htrg3 markdown .
+el markdown template byb2a bel shakl dh : byst5dm el directive @component 
+
+@component('mail::message')
+# Introduction
+
+The body of your message.
+
+@component('mail::button', ['url' => ''])
+Google
+@endcomponent
+
+Thanks,<br>
+{{ config('app.name') }}
+@endcomponent
+
+##########################################################################
+
+# lw 7bet a3del 3la el templates el gahza lel markdown 
+hgebha 3la resources directory 3ndy l2nhom mwgoden fe el vendor directory keda :
+>>>php artisan vendor:publish --tag=laravel-mail -> gebt bs el goz2 bta3 el mail.
+hl2ehom zhro 3ndy fe el views directory : views\vendor . 

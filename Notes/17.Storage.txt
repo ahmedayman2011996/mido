@@ -1,0 +1,15 @@
+# 3shan a5od data mn form w adefha le file w a5zn el file dh fe el storage directory : 
+<form>
+	<input type="text" name="desc">
+</form>
+
+public function store(Request $request)
+{
+    Storage::disk('local')->put('textfile.txt',request()->desc);
+}
+
+# el disk('local') -> howa el default y3ny momken mst5dmsh el fun dy asasa lw ana 3awz a5zen fe el local .
+# disk('public')  -> lw 3awz a5zn fe el public .  
+
+# 3shan arg3 el data mn el file dh : 
+return Storage::get('textfile.txt');

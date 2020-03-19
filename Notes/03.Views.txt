@@ -1,0 +1,11 @@
+# tab3n el view bta3ty lazem teb2a mwgoda fe folder el views ely gowa folder el resources
+w btb2a blade files , el blade files dy 3ebara 3n html templates a2dar akteb feha html codes w kman directives zy :
+
+# Extends & Sections & yields directives : 3shan ast5dem el directives lazem a3mel 2blha @ keda : @extends
+el extends bst5dmha fe eny awrs mn blade file tany : layout.blade.php & welcome.blade.php
+gowa el welcome.blade.php h3mel @extentds('layout.blade.php') keda ay 7aga gowa el layout htb2a fe el welcome
+el @secion('content') dh gowa el welcome gowah el code ely 3awzo yzhar mkan el yield('content') fe el layout
+ex : welcome.blade.php :- @extends('layout.blade.php') @section('content') hena code @endsection
+layout.blade.php :- shwayet html w keda w fe mkan mo3ayan ha7ot el yield('content') w howa el mkan ely 3awz el section('content') yzhar feh .
+
+# ana momken a7mel ay template gahez bs lazem a7oto fe el public folder fe el project bta3y w a5od el html file bta3 el template dh w a5leh blade file fe el views bta3ty .

@@ -1,0 +1,54 @@
+>>>composer require laravel/ui --dev .
+el command dh byft7ly 2 commands godad fe el artisan commands homa : ui & auth:ui
+ui : Swap the front-end scaffolding for the application ely homa (bootstrap, vue, react).
+>php artisan ui vue --auth . 3shan a3mel generate lel authentication scaffolding .
+lma 3mlt el command dh dafly shwayet el 7agat de : "devDependencies" fe el package.json
+w kman dafly fe el view directory : el scaffolding : auth lel login & register & verify etc .
+w dafly fe el web.php : Auth::routes(); -> el routes bta3t el auth .
+Route::get('/home', 'HomeController@index')->name('home'); -> route lel home page .
+# middleware : bbsata ka2no (layers of an onion)->tb2at bsla w 3shan awsl le el core(mrkz) el bsla dy ely heya el application bta3y el user lazem y3dy el layers dy . 
+lma el user y3mel request lel home page el route hyb3to 3la el controller el5as bel home page
+ely howa : HomeController w lw 3ada el middleware y2dar ywsal le actions el mwgoda fel HomeController .
+
+# momken kman adef el middleware lel route nafso keda : 
+Route::get('/home', 'HomeController@index')->name('home')->middleware('auth');
+
+# 3shan a3mel fetch lel data bta3t el authenticated user mn el DB w a3rdha fe el view home.blade.php :
+{{Auth::user()->name}} aw {{auth()->user()->name}} 
+-> edeny el authenticated user : ana keda m3aya instance mn el User model .
+
+# lw 3awz fe el welcome page azher 7aga lw el user dh authenticated w azhr 7aga tany lw howa la2 :
+@auth aw @if(auth()->user()) aw @if(auth()->check()) -> kol dy toro2 a3mel beha check 3la el user dh authenticated wla msh authenticated example :
+@auth 
+    Hello , {{auth()->user()->name}}
+@else
+    Laravel
+@endauth 
+
+# lw 3awz a3mel el 3aks y3ny asho guest wla msh guest :
+@guest
+Please Sign in
+@else
+Hello User
+@endguest
+
+#######################################################
+
+# ResetPassword :
+# el goz2 el 5as bel mail fe el .env file :
+MAIL_MAILER=smtp -> dh el mail driver h8yaro le MAIL_MAILER=log -> el log driver 3shan kol ma ab3t mail hywsal lel log file el mwgod hena : storage\logs\laravel.log
+MAIL_HOST=smtp.mailtrap.io
+MAIL_PORT=2525
+MAIL_USERNAME=null
+MAIL_PASSWORD=null
+MAIL_ENCRYPTION=null
+MAIL_FROM_ADDRESS=null
+MAIL_FROM_NAME="${APP_NAME}"
+
+# the steps of reseting password :
+1-Click forget password.
+2-fill a form with the email address .
+3-prepare a unique token and associate it with the user`s account in the DB .
+4-we send an email to the user with a unique link to get back to our site that confirms email ownership.
+5-link back to website , confirm the token , and set a new password .
+ 

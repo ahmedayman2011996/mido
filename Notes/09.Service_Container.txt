@@ -1,0 +1,80 @@
+# service container : is a container for services , mkan le t5zen w erga3 el services .
+
+# services : any kind of data : string , number , object , collection .
+
+ex :
+Container.php  -> class 3mltha 3shan tb2a el container .
+class Container
+{
+    protected $bindings = []; -> zy ma 2olna el container by5zen f3mlt array a5zn feh el data ely gaya .
+    public function bind($key,$value){ -> fun bb3tlha el key w el value yt5zno fe el array .
+        $this->bindings[$key] = $value;
+    }
+    public function resolve($key){ -> fun bb3tlha el key trg3ly el value .
+        if (isset($this->bindings[$key])){  -> lw el key mwgod ? 
+            return call_user_func($this->bindings[$key]);   -> rg3 el value .
+        }
+    }
+}
+
+web.php -> el routes
+Route::get('/', function () {
+$container = new \App\Container();  -> 3mlt instance mn el container .
+$container->bind('example', function (){   -> est5dmt el instance 3shan a3mel call le fun fe el container w b3tlha key
+   return new \App\Example(); 				w el value bta3t el key dh instance mn el Example class .
+});
+$example = $container->resolve('example');   -> est5dmt el instance 3shan a3mel call le fun bb3tlha el key trg3ly el 																												value.
+$example->go();  -> est5dmt el el variable ely 5znt feh el instance bta3 el Example class 3shan a3mel call le fun fe 
+});																							Example class dy .
+
+Example.php   
+class Example
+{
+    public function go(){
+        echo 'Hello Folks';
+    }
+}
+
+# momken m3mlsh container class w ast5dm el laravel container ely howa el application nafso ^_^
+w a2dar awslo best5dam el app() helper fun :
+web.php
+app()->bind('example',function(){return new \App\Example();})
+Route::get('/', function () {
+	$example = resolve('example');
+	$example->go();
+});
+
+# momken 7ata m3mlsh bind w a3mel instance mn el class example gowa el resolve fun .
+Route::get('/', function () {
+$example = resolve(\App\Example::class);
+$example->go();
+});
+
+# aw momken m3mlsh solve ^_^ w a3mel instance fe goz2 el request : function(goz2 el request) .
+Route::get('/', function (Example $example) {
+$example->go();
+});
+
+# el klam dh b2a kolo yt5azen fen ? mho ana msh ha7oto fe el routes y3ny web.php
+el klam dh byt5zn fe el AppServiceProvider.php
+public function register()
+    {
+        app()->bind('example',function (){return new \App\Example();});
+
+    }
+
+# el 5olasa el el service container dh container feh el services ely heya momken tb2a ay data
+b5zen feh el data bel bind() w arg3ha bel resolve() w a5zn el bind() dy fe el AppServiceProvider.php .     
+
+
+
+######################################################################
+
+# Service Provider :
+
+# el laravel mt2sem le components kol compenet leh ServiceProvider 
+ro7 3la vendor\laravel\framework\src\Illuminate\ay component : htla2y fe kol component fehom ServiceProvider . 
+
+# kol ServiceProvider y2dr y implement 2 methods : register & boot .
+register : ms2ola 3n registration keys fe Service Container .
+boot : btsht8l b3d ma kol ServiceProvider fe el framework yt3mlha register .

@@ -1,0 +1,27 @@
+# view('welcome'); == View::make('welcome'); el 2 nafs el zat nafs .
+# y3ny el view dy helper fun bdela 3n est5dam el facade View .
+# request('name') = Request::input('name');
+
+# kol facade class byb2a feha el fun dy : 
+protected static function getFacadeAccessor()
+    {
+        return 'request';     -> k2ny 3mlt keda : resolve('request');
+    } 
+w btrg3 key 3a2d 3la binding fe el service container .
+
+################################################################
+
+# el 3 toro2 dol zay b3d :
+
+Route::get('/', function () {
+return View::make('welcome');  -> hena est5dmt el facade .
+});
+
+Route::get('/', function () {
+return view('welcome');      -> hena est5dmt el helper fun .
+});    
+
+use Illuminate\Support\Facades\View;
+Route::get('/', function (View $view) {
+return $view->make('welcome'); -> hena 3mlt instance mn el facade class .
+});

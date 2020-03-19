@@ -1,0 +1,24 @@
+# lma a3oz a3mel show aw edit aw update aw delete le resource b7tag el id bta3o el awel w bagebo keda :
+public function show($id){ bykon gay lel fun mn el route
+	$var = Post::find($id); -> Post dh el model
+}
+tayeb el el route galy feh id msh mwgod fe el database asln ? keda hyb2a error . 3shan keda 3melo el fun dy : findOrFail($id); bdl el find 3shan lw el id ely gay lel fun msh mwgod ydeny 404|Not Found .
+
+# Route Model Binding :
+bdal ma ast2bel el id mn el route keda
+public function show($id){ 
+	$var = Post::find($id);
+}
+ana momken a5ly el model y3my instance mno w el laravel hyst2bel el id fe el instance dh keda :
+public function show(Post $id){ 
+	m7tgtsh a3mel el manual query dy : $var = Post::find($id);
+}
+bs hena esm el wildcard mohem bm3na : Route::get('posts/{post}','controller'); yb2a el instance kman $post 
+l2en el laravel by7awel y3mel matching ben el wildcard w el instance bta3 el model w howa dh el Route Model Binding.
+
+# momken a3mel lel routes esm 3shan lw 7asal w el route et8yar 3la sabel el mesal 
+Route::get('posts','Controller@method'); et8yar b2a keda Route::resource('new/posts','PostsController');
+3shan a7afez 3la el route dh fe kol el amaken ely howa most5dm feha a3melo name w anady 3leh bel name dh 
+keda : Route::get('posts','Controller@method')->name('posts.index');
+w anady 3leh keda : <form method="get" action="{{route('posts.index')}}> 
+

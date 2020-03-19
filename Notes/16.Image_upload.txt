@@ -1,0 +1,21 @@
+# 3shan arf3 image bst5dam form : 
+<form enctype='multipart/form-data'> ->lazem adef el enctype .
+<input type="file" name="image" >
+</form>
+
+# b3den a5znha fe el database keda :
+public fun store(){
+$add->image = $request->image->store('images','public');
+}
+
+bs el awel adefo lel migration table : $table->string('image');
+
+# b3den azherha fe el view keda : 
+<img src="{{asset('storage/'.$post->image)}}" width="100" height="50">
+
+# el images btt5zn fe el storage directory : 7sb el disk ely ana m7dedo lw local htb2a 
+hena : storage/app . w lw public htb2a hena : storage/app/public .
+
+# bs 3shan azherha fe el view lazem tb2a fe el directory public l2en dh el directory elw7ed
+ely el user byt3amel m3ah a3mel keda ezay ? eny a3mel link ben el storage w el public directories .
+keda : php artisan storage:link .
